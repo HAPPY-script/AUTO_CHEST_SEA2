@@ -2,7 +2,7 @@ local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 
-
+-- Bảng tọa độ các đích bạn cần đến (Điều chỉnh tọa độ ở đây)
 local destinations = {
     Vector3.new(-386.94, 135.00, 287.58),--cafe
     Vector3.new(-388.01, 135.00, 368.93),
@@ -28,6 +28,7 @@ local destinations = {
     Vector3.new(-1063.34, 259.13, 1161.34),
     Vector3.new(-1260.81, 11.66, 1320.42),
     Vector3.new(-884.43, 8.14, 1843.89),
+    Vector3.new(-850.69, 73.09, 1032.29),
     Vector3.new(-1196.23, 214.40, 1133.90),
     Vector3.new(-1938.90, 241.61, 1750.60),
     Vector3.new(-466.49, 72.85, 1406.21),
@@ -132,15 +133,15 @@ local destinations = {
 }
 
 local stepDistance = 70
-local isActive = false  
-local currentIndex = 1  
+local isActive = false  -- Biến theo dõi trạng thái bật/tắt
+local currentIndex = 1  -- Chỉ mục điểm đến hiện tại
 
-
+-- Hàm tính khoảng cách giữa hai điểm
 local function distance(pos1, pos2)
     return (pos1 - pos2).Magnitude
 end
 
-
+-- Tạo phiến block đỡ chân
 local function createBlock()
     local block = Instance.new("Part")
     block.Size = Vector3.new(5, 1, 5)
@@ -151,7 +152,7 @@ local function createBlock()
     return block
 end
 
-
+-- Menu giao diện
 local ScreenGui = Instance.new("ScreenGui")
 local Frame = Instance.new("Frame")
 local ToggleButton = Instance.new("TextButton")
@@ -195,68 +196,68 @@ CloseButton.Text = "X"
 CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 CloseButton.TextScaled = true
 
-
+-- Hàm teleport đến các vị trí
 local function teleportToNextDestination()
     local block = createBlock()
 
     while isActive do
         local destination = destinations[currentIndex]
         while distance(humanoidRootPart.Position, destination) > stepDistance and isActive do
-            
+            -- Dịch chuyển từng bước
             local direction = (destination - humanoidRootPart.Position).unit
             humanoidRootPart.CFrame = humanoidRootPart.CFrame + direction * stepDistance
 
-            
+            -- Di chuyển block theo người chơi
             block.Position = humanoidRootPart.Position - Vector3.new(0, 3, 0)
-            wait(0.2)  
+            wait(0.2)  -- Mỗi bước dịch chuyển 0.2 giây
         end
         
-        
+        -- Khi gần đến đích, đặt trực tiếp vào tọa độ chính xác
         if distance(humanoidRootPart.Position, destination) <= stepDistance then
             humanoidRootPart.CFrame = CFrame.new(destination)
 
-            
+            -- Kiểm tra điều kiện để nhích qua lại
             if destination ~= Vector3.new(-6500.75, 83.27, -123.33) and destination ~= Vector3.new(919.37, 126.41, 32841.96) then
-                
+                -- Nhích qua lại trong vòng bán kính 1m
                 local startTime = tick()
                 while tick() - startTime < 1 do
                     local randomOffset = Vector3.new(math.random(-100, 100) / 100, 0, math.random(-100, 100) / 100) -- Offset ngẫu nhiên
                     humanoidRootPart.CFrame = CFrame.new(destination) + randomOffset
-                    wait(0.1) 
+                    wait(0.1) -- Nhích mỗi 0.1 giây
                 end
             end
         end
 
-        wait(0.1)
+        wait(0.1)  -- Đợi 3 giây khi đến mỗi đích
 
-        
+        -- Tiếp tục với điểm đến tiếp theo
         currentIndex = currentIndex + 1
         if currentIndex > #destinations then
-            currentIndex = 1 
+            currentIndex = 1 -- Quay về điểm đầu tiên
         end
     end
 
     block:Destroy()
 end
 
-
+-- Nút bật/tắt
 ToggleButton.MouseButton1Click:Connect(function()
     isActive = not isActive
     if isActive then
         ToggleButton.Text = "Stop"
-        currentIndex = 1 
+        currentIndex = 1 -- Quay lại điểm đầu khi bật lại
         teleportToNextDestination()
     else
         ToggleButton.Text = "Start"
     end
 end)
 
-
+-- Nút xóa
 CloseButton.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
 
-
+-- Khi nhân vật được load lại
 player.CharacterAdded:Connect(function(newCharacter)
     character = newCharacter
     humanoidRootPart = character:WaitForChild("HumanoidRootPart")
