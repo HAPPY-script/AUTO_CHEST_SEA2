@@ -2,7 +2,7 @@ local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 
--- Bảng tọa độ các đích bạn cần đến (Điều chỉnh tọa độ ở đây)
+
 local destinations = {
     Vector3.new(-386.94, 135.00, 287.58),--cafe
     Vector3.new(-388.01, 135.00, 368.93),
@@ -33,6 +33,7 @@ local destinations = {
     Vector3.new(-1938.90, 241.61, 1750.60),
     Vector3.new(-466.49, 72.85, 1406.21),
     Vector3.new(840.73, 121.56, 1240.16),
+    Vector3.new(176.67, 73.09, 853.13),
     Vector3.new(881.36, 72.94, 1197.38),
     Vector3.new(852.78, 72.94, 1459.46),
     Vector3.new(-1852.48, 389.03, -69.81),
@@ -196,7 +197,7 @@ CloseButton.Text = "X"
 CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 CloseButton.TextScaled = true
 
--- Hàm teleport đến các vị trí
+
 local function teleportToNextDestination()
     local block = createBlock()
 
@@ -209,7 +210,7 @@ local function teleportToNextDestination()
 
             -- Di chuyển block theo người chơi
             block.Position = humanoidRootPart.Position - Vector3.new(0, 3, 0)
-            wait(0.2)  -- Mỗi bước dịch chuyển 0.2 giây
+            wait(0.2)  
         end
         
         -- Khi gần đến đích, đặt trực tiếp vào tọa độ chính xác
@@ -228,12 +229,12 @@ local function teleportToNextDestination()
             end
         end
 
-        wait(0.1)  -- Đợi 3 giây khi đến mỗi đích
+        wait(0.1)  
 
         -- Tiếp tục với điểm đến tiếp theo
         currentIndex = currentIndex + 1
         if currentIndex > #destinations then
-            currentIndex = 1 -- Quay về điểm đầu tiên
+            currentIndex = 1 
         end
     end
 
@@ -245,19 +246,19 @@ ToggleButton.MouseButton1Click:Connect(function()
     isActive = not isActive
     if isActive then
         ToggleButton.Text = "Stop"
-        currentIndex = 1 -- Quay lại điểm đầu khi bật lại
+        currentIndex = 1 
         teleportToNextDestination()
     else
         ToggleButton.Text = "Start"
     end
 end)
 
--- Nút xóa
+
 CloseButton.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
 
--- Khi nhân vật được load lại
+
 player.CharacterAdded:Connect(function(newCharacter)
     character = newCharacter
     humanoidRootPart = character:WaitForChild("HumanoidRootPart")
